@@ -43,14 +43,20 @@ def handle_command(command, channel):
         Executes bot command if the command is known
     """
     # Default response is help text for the user
-    default_response = "I don't know the answer to that!"
+    default_response = "Something broke! Contact the devs!"
     match = re.search(MENTION_REGEX2, command)
-    history = get_history(channel)
+    user = match.group(1)
+    
+    channelList = get_channels()
     userMessages = []
-    for message in history["messages"]:
-        if 'user' in message:
-            if message["user"] == match.group(1):
-                userMessages.append(message["text"])
+
+    for channelObject in channelList["channels"]:
+        if user in channelObject["members"]:
+            history = get_history(channelObject["id"])
+            for message in history["messages"]:
+                if "user" in message:
+                    if message["user"] == user:
+                        userMessages.append(message["text"])
 
     response = userMessages
 
@@ -60,6 +66,10 @@ def handle_command(command, channel):
         channel=channel,
         text=userMessages or default_response
     )
+
+def get_channels():
+    return slack_client.api_call("channels.list", token=SLACK_USER_TOKEN)
+
 
 def get_history(channel):
     return slack_client.api_call("channels.history", channel=channel, token=SLACK_USER_TOKEN)
