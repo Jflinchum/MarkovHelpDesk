@@ -38,7 +38,7 @@ class Markov():
             i += 1
         return input_data
 
-    def create_response(self, max_len=1000, curr_word=''):
+    def create_response(self, max_len=12, curr_word=''):
         if curr_word == "":
             curr_word = "."
             while curr_word == ".":
@@ -47,8 +47,8 @@ class Markov():
         while self.count_words(return_string) < max_len and not return_string.endswith(". "):
             curr_word = self.choose_next_word(self.word_chain[curr_word])
             return_string += curr_word + " "
-            if return_string.endswith(". "):
-                return_string = return_string[:len(return_string)-3] + "."
+            if return_string[-2] == "." or return_string[-2] == "?" or return_string[-2] == "!":
+                return_string = return_string[:len(return_string)-3] + return_string[-2]
                 break
         return return_string
 

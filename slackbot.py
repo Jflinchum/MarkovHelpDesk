@@ -16,6 +16,7 @@ slack_client = SlackClient(BOT_TOKEN)
 starterbot_id = "MarkovSimulate"
 
 # constants
+SENTENCES = 4
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 MENTION_REGEX2 = "<@(|[WU].+?)>"
@@ -78,7 +79,11 @@ def handle_command(command, channel):
             markovChain += message
         markov = Markov(markovChain)
         markov.create_word_chain()
-        response = markov.create_response(curr_word=random.choice(starterWords))
+        response = ""
+
+        for i in range(0, SENTENCES):
+            response += markov.create_response(curr_word=random.choice(starterWords))
+            response += "\n"
 
         response = re.sub(MENTION_REGEX3, regexUpper, response)
 
