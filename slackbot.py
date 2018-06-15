@@ -5,14 +5,16 @@ from slackclient import SlackClient
 
 
 # instantiate Slack client
-slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
+SLACK_USER_TOKEN = os.environ.get('SLACK_USER_TOKEN')
+slack_client = SlackClient(BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = "MarkovSupportSystem"
 
 # constants
-TEXTFILE = "./data.txt"
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+MENTION_REGEX2 = "<@(|[WU].+?)>"
 
 def parse_bot_commands(slack_events):
     """
@@ -42,18 +44,27 @@ def handle_command(command, channel):
     """
     # Default response is help text for the user
     default_response = "I don't know the answer to that!"
-    print(command)
+    match = re.search(MENTION_REGEX2, command)
+    print match.group(1)
+    history = get_history(channel)
+    userMessages = []
+    for message in history["messages"]:
+        if 'user' in message:
+            print message
+            if message["user"] == match.group(1):
+                userMessages.append(message["text"])
 
-    # This is where you start to implement more commands!
-    response = open(TEXTFILE, "r").read()
-
+    response = userMessages
 
     # Sends the response back to the channel
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
-        text=response or default_response
+        text=userMessages or default_response
     )
+
+def get_history(channel):
+    return slack_client.api_call("channels.history", channel=channel, token=SLACK_USER_TOKEN)
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
