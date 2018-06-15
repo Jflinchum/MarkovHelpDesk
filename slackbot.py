@@ -7,11 +7,11 @@ from slackclient import SlackClient
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
-starterbot_id = None
+starterbot_id = "MarkovSupportSystem"
 
 # constants
+TEXTFILE = "./data.txt"
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
-EXAMPLE_COMMAND = "do"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
 def parse_bot_commands(slack_events):
@@ -41,13 +41,12 @@ def handle_command(command, channel):
         Executes bot command if the command is known
     """
     # Default response is help text for the user
-    default_response = "Not sure what you mean. Try *{}*.".format(EXAMPLE_COMMAND)
+    default_response = "I don't know the answer to that!"
+    print(command)
 
-    # Finds and executes the given command, filling in response
-    response = None
     # This is where you start to implement more commands!
-    if command.startswith(EXAMPLE_COMMAND):
-        response = "Sure...write some more code then I can do that!"
+    response = open(TEXTFILE, "r").read()
+
 
     # Sends the response back to the channel
     slack_client.api_call(
