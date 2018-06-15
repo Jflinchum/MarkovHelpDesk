@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import random
+import copy
 
 class Markov():
     def __init__(self, input_data=''):
@@ -7,7 +8,8 @@ class Markov():
         self.phrase_chain = {}
         self.input_data = input_data
 
-    def create_word_chain(self, input_data):
+    def create_word_chain(self):
+        input_data = copy.deepcopy(self.input_data)
         input_data = ' '.join([line.strip() for line in input_data.strip().splitlines()])
         input_data = input_data.lower()
         input_data = input_data.split(' ')
@@ -29,20 +31,20 @@ class Markov():
         i = 0
         while i < length:
             word = input_data[i]
-            if word[len(word)-1] == "." and len(word) > 1:
+            if len(word) > 1 and word[-1] == ".":
                 input_data[i] = word[:len(word)-1]
                 input_data.insert(i+1, ".")
                 length += 1
             i += 1
         return input_data
 
-    def create_response(self, max_len=10, curr_word=''):
+    def create_response(self, max_len=1000, curr_word=''):
         if curr_word == "":
             curr_word = "."
             while curr_word == ".":
                 curr_word = random.choice(self.word_chain.keys())
         return_string = curr_word + " "
-        while self.count_words(return_string) < 20 and not return_string.endswith(". "):
+        while self.count_words(return_string) < max_len and not return_string.endswith(". "):
             curr_word = self.choose_next_word(self.word_chain[curr_word])
             return_string += curr_word + " "
             if return_string.endswith(". "):
