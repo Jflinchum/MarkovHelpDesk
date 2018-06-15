@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import time
 import re
@@ -52,31 +53,34 @@ def handle_command(command, channel):
     # Default response is help text for the user
     default_response = "Something broke! Contact the devs!"
     match = re.search(MENTION_REGEX2, command)
-    user = match.group(1)
-    
-    channelList = get_channels()
-    userMessages = []
+    response = None
+    if match is None:
+        response = "Cannot find user."
+    else:
+        user = match.group(1) 
+        channelList = get_channels()
+        userMessages = []
 
-    for channelObject in channelList["channels"]:
-        if user in channelObject["members"]:
-            history = get_history(channelObject["id"])
-            for message in history["messages"]:
-                if "user" in message:
-                    if message["user"] == user:
-                        userMessages.append(str(message["text"]))
+        for channelObject in channelList["channels"]:
+            if user in channelObject["members"]:
+                history = get_history(channelObject["id"])
+                for message in history["messages"]:
+                    if "user" in message:
+                        if message["user"] == user:
+                            userMessages.append(message["text"])
 
-    markovChain = ""
-    starterWords = []
-    for message in userMessages:
-        starterWords.append(str(message.split(" ")[0]).lower())
-        if message[-1] != ".":
-            message += ". "
-        markovChain += message
-    markov = Markov(markovChain)
-    markov.create_word_chain()
-    response = markov.create_response(curr_word=random.choice(starterWords))
+        markovChain = ""
+        starterWords = []
+        for message in userMessages:
+            starterWords.append(message.split(" ")[0].lower())
+            if message[-1] != ".":
+                message += ". "
+            markovChain += message
+        markov = Markov(markovChain)
+        markov.create_word_chain()
+        response = markov.create_response(curr_word=random.choice(starterWords))
 
-    response = re.sub(MENTION_REGEX3, regexUpper, response)
+        response = re.sub(MENTION_REGEX3, regexUpper, response)
 
     # Sends the response back to the channel
     slack_client.api_call(

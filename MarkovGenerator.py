@@ -44,7 +44,7 @@ class Markov():
             while curr_word == ".":
                 curr_word = random.choice(self.word_chain.keys())
         return_string = curr_word + " "
-        while self.count_words(return_string) < 20 and not return_string.endswith(". "):
+        while self.count_words(return_string) < max_len and not return_string.endswith(". "):
             curr_word = self.choose_next_word(self.word_chain[curr_word])
             return_string += curr_word + " "
             if return_string.endswith(". "):
