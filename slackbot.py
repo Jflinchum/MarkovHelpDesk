@@ -1,11 +1,11 @@
 import os
 import time
 import re
-from slackclient import SlackClient
+from slackbot.slackclient import SlackClient
 
 
 # instantiate Slack client
-slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+slack_client = SlackClient('xoxb-382218297715-382227750099-L1xF6vAFIQ6PPmFFKt2YzfOR')
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
