@@ -9,7 +9,7 @@ BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 SLACK_USER_TOKEN = os.environ.get('SLACK_USER_TOKEN')
 slack_client = SlackClient(BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
-starterbot_id = "MarkovSupportSystem"
+starterbot_id = "MarkovSimulate"
 
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
@@ -45,12 +45,10 @@ def handle_command(command, channel):
     # Default response is help text for the user
     default_response = "I don't know the answer to that!"
     match = re.search(MENTION_REGEX2, command)
-    print match.group(1)
     history = get_history(channel)
     userMessages = []
     for message in history["messages"]:
         if 'user' in message:
-            print message
             if message["user"] == match.group(1):
                 userMessages.append(message["text"])
 
