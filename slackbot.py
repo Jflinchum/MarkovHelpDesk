@@ -16,7 +16,6 @@ slack_client = SlackClient(BOT_TOKEN)
 starterbot_id = "MarkovSimulate"
 
 # constants
-SENTENCES = 4
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 MENTION_REGEX2 = "<@(|[WU].+?)>"
@@ -51,6 +50,7 @@ def handle_command(command, channel):
     """
         Executes bot command if the command is known
     """
+    SENTENCES = 4
     # Default response is help text for the user
     default_response = "Something broke! Contact the devs!"
     match = re.search(MENTION_REGEX2, command)
@@ -61,6 +61,9 @@ def handle_command(command, channel):
         user = match.group(1) 
         channelList = get_channels()
         userMessages = []
+        
+        if command.split(" ")[-1].isdigit():
+            SENTENCES = int(command.split(" ")[-1])
 
         for channelObject in channelList["channels"]:
             if user in channelObject["members"]:
