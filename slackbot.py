@@ -5,14 +5,17 @@ from slackbot.slackclient import SlackClient
 
 
 # instantiate Slack client
-slack_client = SlackClient('xoxb-382218297715-382227750099-L1xF6vAFIQ6PPmFFKt2YzfOR')
+
+BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
+SLACK_USER_TOKEN = os.environ.get('SLACK_USER_TOKEN')
+slack_client = SlackClient(BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
-starterbot_id = None
+starterbot_id = "MarkovSimulate"
 
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
-EXAMPLE_COMMAND = "do"
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+MENTION_REGEX2 = "<@(|[WU].+?)>"
 
 def parse_bot_commands(slack_events):
     """
@@ -41,20 +44,36 @@ def handle_command(command, channel):
         Executes bot command if the command is known
     """
     # Default response is help text for the user
-    default_response = "Not sure what you mean. Try *{}*.".format(EXAMPLE_COMMAND)
+    default_response = "Something broke! Contact the devs!"
+    match = re.search(MENTION_REGEX2, command)
+    user = match.group(1)
+    
+    channelList = get_channels()
+    userMessages = []
 
-    # Finds and executes the given command, filling in response
-    response = None
-    # This is where you start to implement more commands!
-    if command.startswith(EXAMPLE_COMMAND):
-        response = "Sure...write some more code then I can do that!"
+    for channelObject in channelList["channels"]:
+        if user in channelObject["members"]:
+            history = get_history(channelObject["id"])
+            for message in history["messages"]:
+                if "user" in message:
+                    if message["user"] == user:
+                        userMessages.append(message["text"])
+
+    response = userMessages
 
     # Sends the response back to the channel
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
-        text=response or default_response
+        text=userMessages or default_response
     )
+
+def get_channels():
+    return slack_client.api_call("channels.list", token=SLACK_USER_TOKEN)
+
+
+def get_history(channel):
+    return slack_client.api_call("channels.history", channel=channel, token=SLACK_USER_TOKEN)
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
