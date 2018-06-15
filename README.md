@@ -1,0 +1,1 @@
+Slack bot that uses Markov chains to generate response for user, based on that user's message history.
